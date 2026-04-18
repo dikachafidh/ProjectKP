@@ -21,24 +21,20 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/', fn() => redirect()->route('dashboard'));
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard',     [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/api', [DashboardController::class, 'api'])->name('dashboard.api');
 
-    // =========================================================
-    // PENTING: Route STATIS harus SEBELUM route {parameter}!
-    // /aset/create harus didaftarkan sebelum /aset/{aset}
-    // =========================================================
-
-    // ---- ASET: route statis dulu ----
+    // ---- ASET ----
     Route::get('/aset',        [AsetController::class, 'index'])->name('aset.index');
     Route::get('/scan',        [AsetController::class, 'scan'])->name('aset.scan');
 
-    // Admin-only statis (create) — HARUS sebelum {aset}
+    // Admin-only (create)
     Route::middleware('role:admin')->group(function () {
         Route::get('/aset/create',  [AsetController::class, 'create'])->name('aset.create');
         Route::post('/aset',        [AsetController::class, 'store'])->name('aset.store');
     });
 
-    // Baru route dengan parameter {aset}
+    // Route dengan parameter (harus setelah create)
     Route::get('/aset/{aset}',          [AsetController::class, 'show'])->name('aset.show');
     Route::get('/aset/{aset}/qrcode',   [AsetController::class, 'qrcode'])->name('aset.qrcode');
 
@@ -48,7 +44,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/aset/{aset}',   [AsetController::class, 'destroy'])->name('aset.destroy');
     });
 
-    // ---- MUTASI: statis dulu ----
+    // ---- MUTASI ----
     Route::get('/mutasi', [MutasiAsetController::class, 'index'])->name('mutasi.index');
 
     Route::middleware('role:admin')->group(function () {
@@ -58,7 +54,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/mutasi/{mutasi}', [MutasiAsetController::class, 'show'])->name('mutasi.show');
 
-    // ---- PEMELIHARAAN: statis dulu ----
+    // ---- PEMELIHARAAN ----
     Route::get('/pemeliharaan', [PemeliharaanController::class, 'index'])->name('pemeliharaan.index');
 
     Route::middleware('role:admin')->group(function () {
@@ -74,33 +70,29 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pemeliharaan/{pemeliharaan}',   [PemeliharaanController::class, 'destroy'])->name('pemeliharaan.destroy');
     });
 
-    // ---- LAPORAN (semua bisa) ----
+    // ---- LAPORAN ----
     Route::get('/laporan',            [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/inventaris', [LaporanController::class, 'inventaris'])->name('laporan.inventaris');
     Route::get('/laporan/notifikasi', [LaporanController::class, 'notifikasi'])->name('laporan.notifikasi');
 
-    // ---- MASTER DATA (semua bisa lihat) ----
+    // ---- MASTER DATA ----
     Route::get('/kategori',   [KategoriController::class, 'index'])->name('kategori.index');
     Route::get('/departemen', [DepartemenController::class, 'index'])->name('departemen.index');
     Route::get('/karyawan',   [KaryawanController::class, 'index'])->name('karyawan.index');
 
     Route::middleware('role:admin')->group(function () {
-        // Kategori CRUD
         Route::post('/kategori',              [KategoriController::class, 'store'])->name('kategori.store');
         Route::put('/kategori/{kategori}',    [KategoriController::class, 'update'])->name('kategori.update');
         Route::delete('/kategori/{kategori}', [KategoriController::class, 'destroy'])->name('kategori.destroy');
 
-        // Departemen CRUD
         Route::post('/departemen',               [DepartemenController::class, 'store'])->name('departemen.store');
         Route::put('/departemen/{departemen}',   [DepartemenController::class, 'update'])->name('departemen.update');
         Route::delete('/departemen/{departemen}',[DepartemenController::class, 'destroy'])->name('departemen.destroy');
 
-        // Karyawan CRUD
         Route::post('/karyawan',             [KaryawanController::class, 'store'])->name('karyawan.store');
         Route::put('/karyawan/{karyawan}',   [KaryawanController::class, 'update'])->name('karyawan.update');
         Route::delete('/karyawan/{karyawan}',[KaryawanController::class, 'destroy'])->name('karyawan.destroy');
 
-        // User management
         Route::resource('users', UserController::class);
     });
 });

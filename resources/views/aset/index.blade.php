@@ -6,7 +6,7 @@
 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0">Data Aset Sekolah</h4>
-        <small class="text-muted">SMKN 11 Kota Tangerang &mdash; {{ $asets->total() }} aset terdaftar</small>
+        <small class="text-muted">SMKN 11 Kota Tangerang                 &mdash; {{ $asets->total() }} aset terdaftar</small>
     </div>
     {{-- FITUR 1: Tambah Aset — hanya Admin --}}
     @if(auth()->user()->canCreate())

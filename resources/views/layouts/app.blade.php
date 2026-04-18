@@ -55,6 +55,36 @@
             padding: .55rem 1.1rem .2rem; font-size: .58rem; font-weight: 700;
             text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.3);
         }
+        
+        /* ===== DROPDOWN STYLES ===== */
+        .sb-dropdown {
+            position: relative;
+        }
+        .sb-dropdown-btn {
+            display: flex; align-items: center; gap: .55rem;
+            padding: .55rem 1.1rem; color: rgba(255,255,255,.72); font-size: .8rem; font-weight: 500;
+            text-decoration: none; border-left: 3px solid transparent; transition: all .18s;
+            position: relative; z-index: 1; cursor: pointer;
+            width: 100%; background: none; border: none; font-family: inherit;
+        }
+        .sb-dropdown-btn:hover { background: rgba(255,255,255,.08); color: #fff; padding-left: 1.3rem; }
+        .sb-dropdown-btn .sb-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+        .sb-dropdown-btn .sb-arrow { margin-left: auto; font-size: .7rem; transition: transform .2s; }
+        .sb-dropdown.open .sb-dropdown-btn .sb-arrow { transform: rotate(90deg); }
+        .sb-dropdown-menu {
+            max-height: 0; overflow: hidden; transition: max-height .3s ease-out;
+            background: rgba(0,0,0,.2); margin-left: 1.2rem; border-radius: 0 0 8px 8px;
+        }
+        .sb-dropdown.open .sb-dropdown-menu { max-height: 300px; }
+        .sb-dropdown-item {
+            display: flex; align-items: center; gap: .55rem;
+            padding: .45rem 1.1rem .45rem 2.3rem; color: rgba(255,255,255,.65); font-size: .75rem; font-weight: 500;
+            text-decoration: none; transition: all .18s; position: relative; z-index: 1;
+        }
+        .sb-dropdown-item:hover { background: rgba(255,255,255,.08); color: #fff; padding-left: 2.5rem; }
+        .sb-dropdown-item.active { background: rgba(255,255,255,.1); color: var(--accent-lt); font-weight: 600; border-left: 2px solid var(--accent); margin-left: -2px; }
+        .sb-dropdown-item .sb-icon-sm { font-size: .8rem; width: 16px; text-align: center; }
+
         .sb-link {
             display: flex; align-items: center; gap: .55rem;
             padding: .55rem 1.1rem; color: rgba(255,255,255,.72); font-size: .8rem; font-weight: 500;
@@ -66,7 +96,6 @@
         .sb-link .sb-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
         .sb-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: .58rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
 
-        /* View-only label di sidebar */
         .sb-viewonly {
             margin: .4rem 1.1rem;
             background: rgba(232,160,32,.15); border: 1px solid rgba(232,160,32,.3);
@@ -111,12 +140,6 @@
         .content { padding: 1.15rem; flex: 1; }
         .card { border: none; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
         .card-header { background: #fff; font-weight: 700; font-size: .83rem; border-bottom: 1px solid #f1f5f9; padding: .85rem 1.05rem; border-radius: 14px 14px 0 0 !important; }
-        .stat-card { border-radius: 14px; padding: 1.1rem; color: #fff; position: relative; overflow: hidden; border: none; }
-        .stat-card::after { content:''; position:absolute; right:-15px; top:-15px; width:100px; height:100px; background:rgba(255,255,255,.08); border-radius:50%; }
-        .stat-card .s-icon { font-size: 1.7rem; opacity: .85; margin-bottom: .4rem; }
-        .stat-card .s-val { font-size: 1.55rem; font-weight: 800; line-height: 1; }
-        .stat-card .s-lbl { font-size: .72rem; font-weight: 600; opacity: .85; margin-top: .2rem; }
-        .stat-card .s-sub { font-size: .62rem; opacity: .6; margin-top: .15rem; }
         .table thead th { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: #64748b; font-weight: 700; background: #f8fafc; border-top: none; padding: .6rem .85rem; }
         .table tbody td { padding: .6rem .85rem; vertical-align: middle; }
         .table-hover tbody tr:hover { background: #f8fafc; }
@@ -141,7 +164,6 @@
         }
         @media(max-width:576px) {
             .content { padding: .85rem; }
-            .stat-card .s-val { font-size: 1.3rem; }
             .topbar-badge { display: none; }
         }
     </style>
@@ -155,74 +177,73 @@
     <div class="sb-brand">
         <div class="sb-logo">🏫</div>
         <div>
-            <div class="sb-brand-name">SIMAS ASET</div>
+            <div class="sb-brand-name">SIMAS</div>
             <div class="sb-brand-school">SMKN 11 KOTA TANGERANG</div>
         </div>
     </div>
 
     <div class="sb-scroll">
-        {{-- Info role untuk view-only --}}
-        @if(auth()->user()->isViewOnly())
-        <div class="sb-viewonly mt-2">
-            <div class="role-name">{{ auth()->user()->icon_role }} {{ auth()->user()->label_role }}</div>
-            <div style="margin-top:2px">Mode: Lihat Data Saja</div>
-        </div>
-        @endif
-
-        <div class="sb-section">Menu Utama</div>
+        {{-- Dashboard --}}
         <a href="{{ route('dashboard') }}" class="sb-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <span class="sb-icon">📊</span> Dashboard
         </a>
 
-        <div class="sb-section">Fitur 1 — Aset</div>
-        <a href="{{ route('aset.index') }}" class="sb-link {{ request()->routeIs('aset.index','aset.show') ? 'active' : '' }}">
-            <span class="sb-icon">📦</span> Data Aset
-        </a>
-        @if(auth()->user()->canCreate())
-        <a href="{{ route('aset.create') }}" class="sb-link {{ request()->routeIs('aset.create','aset.edit') ? 'active' : '' }}">
-            <span class="sb-icon">➕</span> Tambah Aset
-        </a>
-        @endif
+        {{-- DROPDOWN: Menu Utama --}}
+        @php
+            $isMenuUtamaActive = request()->routeIs('aset.*') || request()->routeIs('kategori.*') || request()->routeIs('departemen.*') || request()->routeIs('karyawan.*');
+        @endphp
+        <div class="sb-dropdown {{ $isMenuUtamaActive ? 'open' : '' }}" id="dropdownMenuUtama">
+            <button class="sb-dropdown-btn" onclick="toggleDropdown('dropdownMenuUtama')">
+                <span class="sb-icon">📋</span>
+                <span>Menu Utama</span>
+                <span class="sb-arrow">▶</span>
+            </button>
+            <div class="sb-dropdown-menu">
+                <a href="{{ route('aset.index') }}" class="sb-dropdown-item {{ request()->routeIs('aset.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">📦</span> Data Aset
+                </a>
+                <a href="{{ route('kategori.index') }}" class="sb-dropdown-item {{ request()->routeIs('kategori.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">🏷️</span> Kategori
+                </a>
+                <a href="{{ route('departemen.index') }}" class="sb-dropdown-item {{ request()->routeIs('departemen.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">🏢</span> Divisi
+                </a>
+                <a href="{{ route('karyawan.index') }}" class="sb-dropdown-item {{ request()->routeIs('karyawan.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">👥</span> Anggota
+                </a>
+            </div>
+        </div>
 
-        {{-- Fitur 6 — QR Code --}}
-        <a href="{{ route('aset.scan') }}" class="sb-link {{ request()->routeIs('aset.scan') ? 'active' : '' }}">
-            <span class="sb-icon">📷</span>
-            Fitur 6 — Scan QR Code
-        </a>
+        {{-- DROPDOWN: Laporan dan Perbaikan --}}
+        @php
+            $isLaporanActive = request()->routeIs('aset.scan') || request()->routeIs('mutasi.*') || request()->routeIs('laporan.*') || request()->routeIs('pemeliharaan.*');
+        @endphp
+        <div class="sb-dropdown {{ $isLaporanActive ? 'open' : '' }}" id="dropdownLaporan">
+            <button class="sb-dropdown-btn" onclick="toggleDropdown('dropdownLaporan')">
+                <span class="sb-icon">📊</span>
+                <span>Laporan & Perbaikan</span>
+                <span class="sb-arrow">▶</span>
+            </button>
+            <div class="sb-dropdown-menu">
+                <a href="{{ route('aset.scan') }}" class="sb-dropdown-item {{ request()->routeIs('aset.scan') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">📷</span> Scan QR Code
+                </a>
+                <a href="{{ route('mutasi.index') }}" class="sb-dropdown-item {{ request()->routeIs('mutasi.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">🔄</span> Mutasi Aset
+                </a>
+                <a href="{{ route('laporan.inventaris') }}" class="sb-dropdown-item {{ request()->routeIs('laporan.inventaris') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">📋</span> Lap. Inventaris
+                </a>
+                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'superadmin')
+                <a href="{{ route('pemeliharaan.index') }}" class="sb-dropdown-item {{ request()->routeIs('pemeliharaan.*') ? 'active' : '' }}">
+                    <span class="sb-icon-sm">🔧</span> Pemeliharaan
+                </a>
+                @endif
+            </div>
+        </div>
 
-        <div class="sb-section">Fitur 3 & 4 — Tracking</div>
-        <a href="{{ route('mutasi.index') }}" class="sb-link {{ request()->routeIs('mutasi.*') ? 'active' : '' }}">
-            <span class="sb-icon">🔄</span> Mutasi Aset
-        </a>
-        <a href="{{ route('pemeliharaan.index') }}" class="sb-link {{ request()->routeIs('pemeliharaan.*') ? 'active' : '' }}">
-            <span class="sb-icon">🔧</span> Pemeliharaan
-        </a>
-
-        <div class="sb-section">Fitur 7 & 8 — Laporan</div>
-        <a href="{{ route('laporan.inventaris') }}" class="sb-link {{ request()->routeIs('laporan.inventaris') ? 'active' : '' }}">
-            <span class="sb-icon">📋</span> Lap. Inventaris
-        </a>
-        <a href="{{ route('laporan.notifikasi') }}" class="sb-link {{ request()->routeIs('laporan.notifikasi') ? 'active' : '' }}">
-            <span class="sb-icon">🔔</span> Notifikasi
-            @php $n = \App\Models\Aset::whereBetween('masa_garansi',[now(),now()->addDays(30)])->count() + \App\Models\Pemeliharaan::where('status','terjadwal')->whereDate('tanggal_jadwal','<=',now()->addDays(30))->count(); @endphp
-            @if($n > 0)<span class="sb-badge">{{ $n }}</span>@endif
-        </a>
-
-        {{-- Fitur 2 — Kategorisasi (Master Data) --}}
-        <div class="sb-section">Fitur 2 — Master Data</div>
-        <a href="{{ route('kategori.index') }}" class="sb-link {{ request()->routeIs('kategori.*') ? 'active' : '' }}">
-            <span class="sb-icon">🏷️</span> Kategori
-        </a>
-        <a href="{{ route('departemen.index') }}" class="sb-link {{ request()->routeIs('departemen.*') ? 'active' : '' }}">
-            <span class="sb-icon">🏢</span> Departemen
-        </a>
-        <a href="{{ route('karyawan.index') }}" class="sb-link {{ request()->routeIs('karyawan.*') ? 'active' : '' }}">
-            <span class="sb-icon">👥</span> Karyawan
-        </a>
-
-        {{-- Manajemen User — HANYA ADMIN --}}
+        {{-- Manajemen User (hanya untuk yang punya akses) --}}
         @if(auth()->user()->canManageUsers())
-        <div class="sb-section">Admin</div>
         <a href="{{ route('users.index') }}" class="sb-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
             <span class="sb-icon">🔐</span> Manajemen User
         </a>
@@ -248,15 +269,12 @@
             <button class="hamburger" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
             <nav>
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">SIMAS Aset</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">SIMAS</a></li>
                     @yield('breadcrumb')
                 </ol>
             </nav>
         </div>
         <div class="topbar-right">
-            @if(auth()->user()->isViewOnly())
-            <span class="badge bg-warning text-dark">👁 View Only</span>
-            @endif
             @php $notifG = \App\Models\Aset::whereBetween('masa_garansi',[now(),now()->addDays(30)])->count(); @endphp
             @if($notifG > 0)
             <a href="{{ route('laporan.notifikasi') }}" class="topbar-badge text-decoration-none">
@@ -302,8 +320,36 @@ function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('active');
 }
-document.querySelectorAll('.sb-link').forEach(l => {
-    l.addEventListener('click', () => { if(window.innerWidth <= 992) closeSidebar(); });
+
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    dropdown.classList.toggle('open');
+    
+    // Tutup dropdown lain
+    document.querySelectorAll('.sb-dropdown').forEach(dd => {
+        if (dd.id !== id) {
+            dd.classList.remove('open');
+        }
+    });
+}
+
+// Tutup dropdown saat klik di luar (untuk mobile)
+document.addEventListener('click', function(event) {
+    if (window.innerWidth <= 992) {
+        const isClickInside = event.target.closest('.sb-dropdown');
+        if (!isClickInside) {
+            document.querySelectorAll('.sb-dropdown').forEach(dd => {
+                dd.classList.remove('open');
+            });
+        }
+    }
+});
+
+// Event listener untuk link di sidebar (tutup sidebar di mobile)
+document.querySelectorAll('.sb-link, .sb-dropdown-item').forEach(l => {
+    l.addEventListener('click', () => { 
+        if(window.innerWidth <= 992) closeSidebar(); 
+    });
 });
 </script>
 @stack('scripts')

@@ -23,10 +23,7 @@
                             <label class="form-label fw-semibold small">Nama Aset <span class="text-danger">*</span></label>
                             <input type="text" name="nama" class="form-control" value="{{ old('nama', $aset->nama) }}" required>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold small">Merek</label>
-                            <input type="text" name="merek" class="form-control" value="{{ old('merek', $aset->merek) }}">
-                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Serial Number</label>
                             <input type="text" name="serial_number" class="form-control" value="{{ old('serial_number', $aset->serial_number) }}">
@@ -108,14 +105,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Departemen</label>
+                        <label class="form-label fw-semibold small">Divisi</label>
                         <select name="departemen_id" class="form-select" required>
                             @foreach($departemens as $d)
                             <option value="{{ $d->id }}" {{ old('departemen_id',$aset->departemen_id)==$d->id?'selected':'' }}>{{ $d->nama }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label class="form-label fw-semibold small">Penanggung Jawab</label>
                         <select name="penanggung_jawab_id" class="form-select">
                             <option value="">-- Tidak Ada --</option>
@@ -125,7 +122,7 @@
                             </option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
                     <div>
                         <label class="form-label fw-semibold small">Foto Aset</label>
                         @if($aset->foto)

@@ -12,11 +12,11 @@
         <small class="text-muted"><code>{{ $aset->kode_aset }}</code> &bull; {{ $aset->kategori->nama ?? '-' }}</small>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('aset.qrcode', $aset) }}" class="btn btn-secondary btn-sm">
+        <a href="{{ route('aset.qrcode', $aset->id) }}" class="btn btn-secondary btn-sm">
             <i class="bi bi-qr-code me-1"></i> QR Code
         </a>
         @if(auth()->user()->canEdit())
-        <a href="{{ route('aset.edit', \$aset) }}" class="btn btn-warning btn-sm text-white">
+        <a href="{{ route('aset.edit', $aset->id) }}" class="btn btn-warning btn-sm text-white">
             <i class="bi bi-pencil me-1"></i> Edit
         </a>
         @endif
@@ -103,7 +103,14 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0 align-middle">
-                    <thead><tr><th>Tanggal</th><th>Dari</th><th>Ke</th><th>Alasan</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Dari</th>
+                            <th>Ke</th>
+                            <th>Alasan</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @forelse($aset->mutasis as $m)
                         <tr>
@@ -113,7 +120,9 @@
                             <td class="small text-muted">{{ Str::limit($m->alasan, 40) }}</td>
                         </tr>
                         @empty
-                        <tr><td colspan="4" class="text-center text-muted small py-2">Belum ada riwayat mutasi</td></tr>
+                        <tr>
+                            <td colspan="4" class="text-center text-muted small py-2">Belum ada riwayat mutasi</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -128,17 +137,26 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0 align-middle">
-                    <thead><tr><th>Tanggal</th><th>Jenis</th><th>Biaya</th><th>Status</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Biaya</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @forelse($aset->pemeliharaans as $p)
                         <tr>
                             <td class="small">{{ $p->tanggal_jadwal->format('d/m/Y') }}</td>
                             <td class="small">{{ $p->label_jenis }}</td>
                             <td class="small">Rp {{ number_format($p->biaya,0,',','.') }}</td>
-                            <td>{!! $p->label_status !!}</td>
+                            <td class="small">{!! $p->label_status !!}</td>
                         </tr>
                         @empty
-                        <tr><td colspan="4" class="text-center text-muted small py-2">Belum ada riwayat pemeliharaan</td></tr>
+                        <tr>
+                            <td colspan="4" class="text-center text-muted small py-2">Belum ada riwayat pemeliharaan</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -164,12 +182,13 @@
                         <span style="font-size:.8rem">🏫</span>
                         <small style="font-size:.6rem;font-weight:700;color:#0f4c75">SMKN 11 TANGERANG</small>
                     </div>
-                    {!! QrCode::size(140)->generate(route('aset.scan').'?kode='.$aset->kode_aset) !!}
+                    {{-- QR CODE PAKAI CDN (TIDAK PERLU PACKAGE) --}}
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode(route('aset.scan').'?kode='.$aset->kode_aset) }}" alt="QR Code">
                     <div class="fw-bold" style="font-size:.75rem;margin-top:4px">{{ $aset->kode_aset }}</div>
                     <div style="font-size:.65rem;color:#64748b">{{ Str::limit($aset->nama, 22) }}</div>
                 </div>
                 <div class="d-grid mt-2">
-                    <a href="{{ route('aset.qrcode', $aset) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('aset.qrcode', $aset->id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-printer me-1"></i>Cetak Label QR
                     </a>
                 </div>
@@ -180,25 +199,26 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     @if(auth()->user()->canEdit())
-                    <a href="{{ route('aset.edit', \$aset) }}" class="btn btn-warning text-white">
+                    <a href="{{ route('aset.edit', $aset->id) }}" class="btn btn-warning text-white">
                         <i class="bi bi-pencil me-1"></i> Edit Aset
                     </a>
                     @endif
                     @if(auth()->user()->canCreate())
-                    <a href="{{ route('mutasi.create') }}" class="btn btn-info text-white">
+                    <a href="{{ route('mutasi.create') }}?aset={{ $aset->id }}" class="btn btn-info text-white">
                         <i class="bi bi-arrow-left-right me-1"></i> Catat Mutasi
                     </a>
-                    <a href="{{ route('pemeliharaan.create') }}" class="btn btn-secondary">
+                    <a href="{{ route('pemeliharaan.create') }}?aset={{ $aset->id }}" class="btn btn-secondary">
                         <i class="bi bi-wrench me-1"></i> Jadwal Maintenance
                     </a>
                     @if(auth()->user()->canDelete())
-                    <form method="POST" action="{{ route('aset.destroy', $aset) }}"
+                    <form method="POST" action="{{ route('aset.destroy', $aset->id) }}"
                         onsubmit="return confirm('Yakin hapus aset ini?')">
                         @csrf @method('DELETE')
                         <button class="btn btn-outline-danger w-100">
                             <i class="bi bi-trash me-1"></i> Hapus Aset
                         </button>
                     </form>
+                    @endif
                     @endif
                 </div>
             </div>
